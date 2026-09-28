@@ -1,4 +1,4 @@
-name: Import verified 1.0.5 update assets
+name: Import verified 1.1.0 update assets
 
 on:
   workflow_dispatch:
@@ -15,15 +15,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir assets
-          gh release download v1.0.5 --repo MoStafaMTP/Photo-Studio --dir assets --pattern 'Photo-Studio-Setup-1.0.5-x64.exe' --pattern 'Photo-Studio-Setup-1.0.5-x64.exe.blockmap' --pattern 'latest.yml'
+          gh release download v1.1.0 --repo MoStafaMTP/Photo-Studio --dir assets --pattern 'Photo-Studio-Setup-1.1.0-x64.exe' --pattern 'Photo-Studio-Setup-1.1.0-x64.exe.blockmap' --pattern 'latest.yml'
           cd assets
           printf '%s\n' \
-            '7401be82b238fbae69e5cd428445af78ce9f73d35c154706a4cb87ea049f354d  Photo-Studio-Setup-1.0.5-x64.exe' \
-            '68b9b0d77c654a498b8643a201f4a820a9f361c97aa46e5b2a8fd8fcfbef4a92  Photo-Studio-Setup-1.0.5-x64.exe.blockmap' \
-            '2a46e74630f053075102cc3fe59c929496bcdd4b9f500ab2a58f5ebcd83bec8f  latest.yml' | sha256sum --check
+            'd198a4c76220b87062d151fcaee93ac69889edb442990921445acd4c681a3163  Photo-Studio-Setup-1.1.0-x64.exe' \
+            '63195df8f226aaec65c01d90eb00e163b3d237645a3c511b0aae0a75b9c2fab2  Photo-Studio-Setup-1.1.0-x64.exe.blockmap' \
+            '1252fff021f6df1c12e203706c74ce434c226f1b9c1c3f7a6b0e5476bc12b2c1  latest.yml' | sha256sum --check
       - name: Upload to the reviewed updates draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(gh release view v1.0.5 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
-          gh release upload v1.0.5 assets/* --repo MoStafaMTP/Photo-Studio-Updates
+          test "$(gh release view v1.1.0 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
+          gh release upload v1.1.0 assets/* --repo MoStafaMTP/Photo-Studio-Updates
