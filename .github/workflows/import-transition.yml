@@ -1,4 +1,4 @@
-name: Import verified 1.0.4 transition assets
+name: Import verified 1.0.5 update assets
 
 on:
   workflow_dispatch:
@@ -10,20 +10,20 @@ jobs:
   import:
     runs-on: ubuntu-latest
     steps:
-      - name: Download and verify the official transition build
+      - name: Download and verify the reviewed build
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir assets
-          gh release download v1.0.4 --repo MoStafaMTP/Photo-Studio --dir assets --pattern 'Photo-Studio-Setup-1.0.4-x64.exe' --pattern 'Photo-Studio-Setup-1.0.4-x64.exe.blockmap' --pattern 'latest.yml'
+          gh release download v1.0.5 --repo MoStafaMTP/Photo-Studio --dir assets --pattern 'Photo-Studio-Setup-1.0.5-x64.exe' --pattern 'Photo-Studio-Setup-1.0.5-x64.exe.blockmap' --pattern 'latest.yml'
           cd assets
           printf '%s\n' \
-            '3e9901ff88e092e29ee68795e9562c5e51c9a335ae141156fa2efad902fc993d  Photo-Studio-Setup-1.0.4-x64.exe' \
-            '64e27f64119b0c2a01dca654d561d68babdb16c8fcac98b619a9424121bda2bc  Photo-Studio-Setup-1.0.4-x64.exe.blockmap' \
-            '4def1ac8d7dc1af921edffbd197587053cecc03a96215e894eeb3f02b374c68c  latest.yml' | sha256sum --check
-      - name: Upload to the existing updates draft
+            '7401be82b238fbae69e5cd428445af78ce9f73d35c154706a4cb87ea049f354d  Photo-Studio-Setup-1.0.5-x64.exe' \
+            '68b9b0d77c654a498b8643a201f4a820a9f361c97aa46e5b2a8fd8fcfbef4a92  Photo-Studio-Setup-1.0.5-x64.exe.blockmap' \
+            '2a46e74630f053075102cc3fe59c929496bcdd4b9f500ab2a58f5ebcd83bec8f  latest.yml' | sha256sum --check
+      - name: Upload to the reviewed updates draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(gh release view v1.0.4 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
-          gh release upload v1.0.4 assets/* --repo MoStafaMTP/Photo-Studio-Updates --clobber
+          test "$(gh release view v1.0.5 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
+          gh release upload v1.0.5 assets/* --repo MoStafaMTP/Photo-Studio-Updates
