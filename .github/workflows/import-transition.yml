@@ -1,7 +1,24 @@
-name: Import verified 1.1.0 update assets
+name: Import verified Windows update assets
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Version tag (for example v1.2.0)
+        required: true
+        type: string
+      installer_sha256:
+        description: Verified installer SHA-256
+        required: true
+        type: string
+      blockmap_sha256:
+        description: Verified blockmap SHA-256
+        required: true
+        type: string
+      manifest_sha256:
+        description: Verified latest.yml SHA-256
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -13,17 +30,30 @@ jobs:
       - name: Download and verify the reviewed build
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          INSTALLER_SHA256: ${{ inputs.installer_sha256 }}
+          BLOCKMAP_SHA256: ${{ inputs.blockmap_sha256 }}
+          MANIFEST_SHA256: ${{ inputs.manifest_sha256 }}
         run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          for hash in "$INSTALLER_SHA256" "$BLOCKMAP_SHA256" "$MANIFEST_SHA256"; do
+            [[ "$hash" =~ ^[0-9a-f]{64}$ ]]
+          done
+          installer="Photo-Studio-Setup-${VERSION#v}-x64.exe"
+          test "$(gh release view "$VERSION" --repo MoStafaMTP/Photo-Studio --json isPrerelease --jq .isPrerelease)" = true
           mkdir assets
-          gh release download v1.1.0 --repo MoStafaMTP/Photo-Studio --dir assets --pattern 'Photo-Studio-Setup-1.1.0-x64.exe' --pattern 'Photo-Studio-Setup-1.1.0-x64.exe.blockmap' --pattern 'latest.yml'
+          gh release download "$VERSION" --repo MoStafaMTP/Photo-Studio --dir assets --pattern "$installer" --pattern "$installer.blockmap" --pattern latest.yml
           cd assets
           printf '%s\n' \
-            'd198a4c76220b87062d151fcaee93ac69889edb442990921445acd4c681a3163  Photo-Studio-Setup-1.1.0-x64.exe' \
-            '63195df8f226aaec65c01d90eb00e163b3d237645a3c511b0aae0a75b9c2fab2  Photo-Studio-Setup-1.1.0-x64.exe.blockmap' \
-            '1252fff021f6df1c12e203706c74ce434c226f1b9c1c3f7a6b0e5476bc12b2c1  latest.yml' | sha256sum --check
+            "$INSTALLER_SHA256  $installer" \
+            "$BLOCKMAP_SHA256  $installer.blockmap" \
+            "$MANIFEST_SHA256  latest.yml" | sha256sum --check
       - name: Upload to the reviewed updates draft
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
         run: |
-          test "$(gh release view v1.1.0 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
-          gh release upload v1.1.0 assets/* --repo MoStafaMTP/Photo-Studio-Updates
+          set -euo pipefail
+          test "$(gh release view "$VERSION" --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
+          gh release upload "$VERSION" assets/* --clobber --repo MoStafaMTP/Photo-Studio-Updates
