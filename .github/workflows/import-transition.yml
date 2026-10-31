@@ -24,5 +24,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(gh release view v2.0.0 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
-          gh release upload v2.0.0 'assets/Photo-Studio-Setup-2.0.0-x64.exe' --repo MoStafaMTP/Photo-Studio-Updates
+          test "$(gh api repos/MoStafaMTP/Photo-Studio-Updates/releases/429925454 --jq '.draft and (.tag_name == "v2.0.0")')" = true
+          curl --fail --silent --show-error --request POST \
+            -H "Authorization: Bearer $GH_TOKEN" -H 'Content-Type: application/octet-stream' \
+            --data-binary '@assets/Photo-Studio-Setup-2.0.0-x64.exe' \
+            'https://uploads.github.com/repos/MoStafaMTP/Photo-Studio-Updates/releases/429925454/assets?name=Photo-Studio-Setup-2.0.0-x64.exe' > asset.json
+          jq '{name,size,digest}' asset.json
