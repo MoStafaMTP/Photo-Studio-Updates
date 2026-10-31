@@ -1,4 +1,4 @@
-name: Import verified 1.2.4 installer
+name: Import verified 2.0.0 installer
 on:
   workflow_dispatch:
     inputs:
@@ -18,11 +18,11 @@ jobs:
         run: |
           echo "::add-mask::$INSTALLER_URL"
           mkdir assets
-          curl --fail --location --retry 3 --silent --show-error "$INSTALLER_URL" -o 'assets/Photo-Studio-Setup-1.2.4-x64.exe'
-          echo '27e7d355385dc10c4bd5b6ae884d87483e123cdf705316a9c5824c98897be8ca  assets/Photo-Studio-Setup-1.2.4-x64.exe' | sha256sum --check
+          curl --fail --location --retry 3 --silent --show-error "$INSTALLER_URL" -o 'assets/Photo-Studio-Setup-2.0.0-x64.exe'
+          echo '4fbc77b1a5921101c5cd74257cbf44eb58183d5fcd61893160b25b0f5e3b390b  assets/Photo-Studio-Setup-2.0.0-x64.exe' | sha256sum --check
       - name: Upload only to the unpublished draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(gh release view v1.2.4 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
-          gh release upload v1.2.4 'assets/Photo-Studio-Setup-1.2.4-x64.exe' --repo MoStafaMTP/Photo-Studio-Updates
+          test "$(gh release view v2.0.0 --repo MoStafaMTP/Photo-Studio-Updates --json isDraft --jq .isDraft)" = true
+          gh release upload v2.0.0 'assets/Photo-Studio-Setup-2.0.0-x64.exe' --repo MoStafaMTP/Photo-Studio-Updates
