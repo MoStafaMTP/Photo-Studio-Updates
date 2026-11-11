@@ -1,4 +1,4 @@
-name: Import verified 2.0.5 installer
+name: Import verified 2.0.6 installer
 on:
   workflow_dispatch:
     inputs:
@@ -18,15 +18,15 @@ jobs:
         run: |
           echo "::add-mask::$INSTALLER_URL"
           mkdir assets
-          curl --fail --location --retry 3 --silent --show-error "$INSTALLER_URL" -o 'assets/Photo-Studio-Setup-2.0.5-x64.exe'
-          echo 'aa375cd239e2e6736a41e59d1a439cdb541ec0a35a94bb786f06b7018e2fa3ec  assets/Photo-Studio-Setup-2.0.5-x64.exe' | sha256sum --check
+          curl --fail --location --retry 3 --silent --show-error "$INSTALLER_URL" -o 'assets/Photo-Studio-Setup-2.0.6-x64.exe'
+          echo '9b6685da73b26ffdf76f727af0517f5fdcb4dd7aded72059a64aacf2c4d44bb7  assets/Photo-Studio-Setup-2.0.6-x64.exe' | sha256sum --check
       - name: Upload only to the unpublished draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(gh api repos/MoStafaMTP/Photo-Studio-Updates/releases/439454985 --jq '.draft and (.tag_name == "v2.0.5")')" = true
+          test "$(gh api repos/MoStafaMTP/Photo-Studio-Updates/releases/441488602 --jq '.draft and (.tag_name == "v2.0.6")')" = true
           curl --fail --silent --show-error --request POST \
             -H "Authorization: Bearer $GH_TOKEN" -H 'Content-Type: application/octet-stream' \
-            --data-binary '@assets/Photo-Studio-Setup-2.0.5-x64.exe' \
-            'https://uploads.github.com/repos/MoStafaMTP/Photo-Studio-Updates/releases/439454985/assets?name=Photo-Studio-Setup-2.0.5-x64.exe' > asset.json
+            --data-binary '@assets/Photo-Studio-Setup-2.0.6-x64.exe' \
+            'https://uploads.github.com/repos/MoStafaMTP/Photo-Studio-Updates/releases/441488602/assets?name=Photo-Studio-Setup-2.0.6-x64.exe' > asset.json
           jq '{name,size,digest}' asset.json
